@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <p id="name">Name : </p>
+    <p id="email">Email : </p>
+    <p id="balance">Balance : </p>
+    <input type="text" id="amount" placeholder="Enter amount to transfer">
+    <br>
+    <h4>Transfer to</h4>
+    <select id="mySelect"></select>
+    <br>
+    <button id="send-btn">Transfer Money</button>
+
+    <script>
+        var select = document.getElementById("mySelect");
+        var url = new URL(window.location.href);
+        var id = url.searchParams.get("id");
+        var user;
+        fetch("/customers/" + id)
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res)
+                user = res;
+                document.getElementById('name').innerHTML += res.name;
+                document.getElementById('email').innerHTML += res.email;
+                document.getElementById('balance').innerHTML += res.currentBalance;
+            });
+        fetch("/customers")
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res)
+                for (var i = 0; i < res.length; i++) {
+                    if(user._id!==res[i]._id){
+                        var option = document.createElement('option');
+                        option.text = res[i].name;
+                        option.value = res[i]._id;
+                        select.add(option, 0);
+                    }
+                }
+
+            });
+        document.getElementById('send-btn').addEventListener('click', () => {
+            var id = select.value;
+            var amount = document.getElementById("amount").value;
+            console.log(id, amount)
+            fetch("/transfer", {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ to: id, from: user._id, amount: parseInt(amount), }),
+            })
+                .then((res) => res.json())
+                .then((res) => {
+                    if(amount>user.currentBalance){
+                        return alert('Insufficient Funds');
+                    }
+                    console.log(res)
+                    alert('Money transfered')
+                    window.location.reload()
+                });
+        })
+    </script>
+</body>
+
+</html>

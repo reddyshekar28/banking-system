@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a href="./transaction.html">Transactions</a>
+    <h1>Customer List</h1>
+    <table id="table">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Customer Name</th>
+                <th>Balance</th>
+                <th>Email</th>
+                <th>Account Number</th>
+                <th>Tranfer</th>
+            </tr>
+        </thead>
+    </table>
+    <script>
+        fetch("/customers")
+            .then((res) => res.json())
+            .then((res) => {
+                console.log(res)
+                var table = document.getElementById("table");
+                res.forEach((file, i) => {
+                    var row = table.insertRow();
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    var cell6 = row.insertCell(5);
+                    cell1.innerHTML = i + 1;
+                    cell2.innerHTML = file.name;
+                    cell3.innerHTML = file.currentBalance;
+                    cell4.innerHTML = `<p>${file.email}</p>`;
+                    cell5.innerHTML = file._id.substr(file._id.length-6);
+                    cell6.innerHTML = `<p class='delete-btn' onclick="deleteFile('${file._id}')" id="${file._id}">Transfer Money</p>`;
+                });
+                console.log(res);
+            });
+        deleteFile = (id) => {
+            window.location="addmoney.html?id="+id;
+        };
+    </script>
+</body>
+</html>
